@@ -17,14 +17,14 @@
 
 <!-- daily-backend:start -->
 
-<p><sub>22 Nov 2026 · Retries</sub></p>
+<p><sub>25 Nov 2026 · Pagination</sub></p>
 
-<p><strong>A client sends a payment request and times out. Is it safe to send exactly the same request again?</strong></p>
+<p><strong>Every result is sorted by created_at. Two rows have the same timestamp. Which one appears first?</strong></p>
 
 <details>
 <summary>Reveal the answer</summary>
 
-<p>The timeout only tells you the client stopped waiting. The charge may already exist. If the provider supports idempotency keys, reuse the original key for the same payment and check its recorded outcome.</p>
+<p>Either one can. For a repeatable order, add a unique tie-breaker such as id and use both fields in the pagination cursor.</p>
 
 </details>
 
