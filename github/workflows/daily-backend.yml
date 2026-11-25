@@ -1,0 +1,26 @@
+name: Daily backend challenge
+on:
+  schedule:
+    - cron: '17 21 * * *' # 00:17 in Amman (UTC+3)
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: daily-backend-challenge
+jobs:
+  rotate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Select today's question
+        run: python3 .github/scripts/rotate_challenge.py
+      - name: Save the challenge
+        run: |
+          git add -- README.md
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Rotate the daily backend challenge'
+          git push
