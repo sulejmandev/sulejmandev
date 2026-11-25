@@ -1,4 +1,4 @@
-![Sulejman Alawashreh · Software Engineer · Amman, Jordan](assets/sulejman-studio-intro.gif)
+![Sulejman Alawashreh · Software Engineer · Amman, Jordan](assets/sulejman-s-reverse-9f778fc9.gif)
 
 <p>I’m a software engineer who turns complex workflows into straightforward web applications. I design each feature around how data moves, how the pieces fit together, and what should happen when something goes wrong.</p>
 
