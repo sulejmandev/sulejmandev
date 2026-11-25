@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 
 START = '<!-- daily-backend:start -->'
 END = '<!-- daily-backend:end -->'
-FIRST_DAY = date(2026, 11, 22)
+FIRST_DAY = date(2026, 11, 25)
 
 def render(readme, bank, day):
     if readme.count(START) != 1 or readme.count(END) != 1:
@@ -16,14 +16,21 @@ def render(readme, bank, day):
     _, after = tail.split(END)
     entry = bank[(day - FIRST_DAY).days % len(bank)]
     topic, question, answer = (escape(entry[k]) for k in ('topic', 'question', 'answer'))
+    code = entry['code']
+    expected = escape(entry['output'])
     block = f'''
 <p><sub>{day:%d %b %Y} · {topic}</sub></p>
 
 <p><strong>{question}</strong></p>
 
+```javascript
+{code}
+```
+
 <details>
 <summary>Reveal the answer</summary>
 
+<p>Output: <code>{expected}</code></p>
 <p>{answer}</p>
 
 </details>

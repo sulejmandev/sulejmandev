@@ -1,152 +1,212 @@
 [
   {
-    "topic": "Retries",
-    "question": "A client sends a payment request and times out. Is it safe to send exactly the same request again?",
-    "answer": "The timeout only tells you the client stopped waiting. The charge may already exist. If the provider supports idempotency keys, reuse the original key for the same payment and check its recorded outcome."
+    "topic": "Concurrent writes",
+    "question": "Both calls finish. What does the last line print?",
+    "code": "let count = 0;\nasync function increment() {\n  const previous = count;\n  await Promise.resolve();\n  count = previous + 1;\n}\nawait Promise.all([increment(), increment()]);\nconsole.log(count);",
+    "output": "1",
+    "answer": "Both calls read 0 before either resumes after await. Both then write 1. For a shared database counter, increment it atomically in the database."
   },
   {
-    "topic": "SQL",
-    "question": "A table has ten orders. Only three rows have a shipped_at value. What does COUNT(shipped_at) return?",
-    "answer": "Three. COUNT(column) skips NULL values. COUNT(*) counts all ten rows."
+    "topic": "Caching zero",
+    "question": "How many times does this function read the stock?",
+    "code": "const cache = new Map();\nlet reads = 0;\nfunction stock(sku) {\n  if (cache.get(sku)) return cache.get(sku);\n  reads++;\n  cache.set(sku, 0);\n  return 0;\n}\nstock(\"A\"); stock(\"A\");\nconsole.log(reads);",
+    "output": "2",
+    "answer": "A stock count of 0 is falsy, so both calls miss the cache check. Use cache.has(sku) to distinguish a cached zero from a missing entry."
   },
   {
-    "topic": "Queues",
-    "question": "A worker saves an invoice, then crashes before acknowledging the message. Can the same invoice arrive again?",
-    "answer": "Yes, with an at-least-once queue. Record a stable invoice or event ID with the write so a redelivery cannot create a second invoice."
+    "topic": "Retry budget",
+    "question": "With a retry limit of zero, what does this function return?",
+    "code": "function retryLimit(value) {\n  return value || 3;\n}\nconsole.log(retryLimit(0));",
+    "output": "3",
+    "answer": "The || operator replaces zero with the default. Use value ?? 3 when zero means no retries."
   },
   {
-    "topic": "Pagination",
-    "question": "Every result is sorted by created_at. Two rows have the same timestamp. Which one appears first?",
-    "answer": "Either one can. For a repeatable order, add a unique tie-breaker such as id and use both fields in the pagination cursor."
+    "topic": "Async filtering",
+    "question": "Only job 2 is ready. Which IDs does this return?",
+    "code": "function readyJobs(ids) {\n  return ids.filter(async id => id === 2);\n}\nconsole.log(readyJobs([1, 2]).join(\",\"));",
+    "output": "1,2",
+    "answer": "filter checks the callback result immediately. Both promises are truthy, even the one that resolves to false. Await the readiness checks before filtering."
   },
   {
-    "topic": "Caching",
-    "question": "An API caches “user not found” for ten minutes. A user signs up one second later. What can the next lookup return?",
-    "answer": "It can still return “not found.” Invalidate the negative entry after signup or choose a shorter lifetime for misses."
+    "topic": "Queue depth",
+    "question": "Two requests ask for a queue size. What does the second one see?",
+    "code": "const queue = [\"email\", \"report\"];\nfunction previewQueue() {\n  return queue.splice(0, 2);\n}\npreviewQueue();\nconsole.log(queue.length);",
+    "output": "0",
+    "answer": "splice removes the items from the original array. A preview should use slice if it must leave the queue intact."
   },
   {
-    "topic": "Concurrency",
-    "question": "Two API instances each keep a counter in memory and allow five requests per minute. Is the overall limit five?",
-    "answer": "A client routed to both instances can get ten. A global limit needs a shared, atomic counter or a single enforcement point."
+    "topic": "Request IDs",
+    "question": "Two database IDs arrive as strings. What does the comparison print?",
+    "code": "function sameId(a, b) {\n  return Number(a) === Number(b);\n}\nconsole.log(sameId(\"9007199254740992\", \"9007199254740993\"));",
+    "output": "true",
+    "answer": "These integers exceed JavaScript’s safe integer range. Converting to Number collapses them to the same value. Keep opaque IDs as strings."
   },
   {
-    "topic": "HTTP",
-    "question": "A client gets 202 Accepted after uploading a report. Is the generated report ready to download?",
-    "answer": "Not necessarily. The server accepted the job for processing. Give the client a job ID or status URL so it can learn when the report is ready."
+    "topic": "Configuration",
+    "question": "The environment variable is the string \"false\". Is the job enabled?",
+    "code": "function jobEnabled(value) {\n  return Boolean(value);\n}\nconsole.log(jobEnabled(\"false\"));",
+    "output": "true",
+    "answer": "A nonempty string converts to true. Parse the allowed configuration values explicitly."
   },
   {
-    "topic": "Transactions",
-    "question": "A transaction sends a welcome email, then its database write rolls back. Does the rollback cancel the email?",
-    "answer": "No. The email is outside the database transaction. Store an email job in the same transaction and have a worker deliver it after commit."
+    "topic": "Request options",
+    "question": "The caller sends an explicit null. What timeout is returned?",
+    "code": "function timeout({ ms = 500 }) {\n  return ms;\n}\nconsole.log(timeout({ ms: null }));",
+    "output": "null",
+    "answer": "A destructuring default only applies to undefined. Apply a nullish default or reject null if the API contract requires a number."
   },
   {
-    "topic": "Replication",
-    "question": "A user saves their new name and immediately sees their old one. The write succeeded. How can both be true?",
-    "answer": "The read may have gone to a replica that has not caught up. Use the primary for reads that must immediately reflect a confirmed write, or wait for the replica to catch up."
+    "topic": "Job priority",
+    "question": "Which priority does this function return?",
+    "code": "function lowestPriority(values) {\n  return [...values].sort()[0];\n}\nconsole.log(lowestPriority([2, 10, 3]));",
+    "output": "10",
+    "answer": "Default array sorting compares string representations. Use a numeric comparator for numeric priorities."
   },
   {
-    "topic": "SQL joins",
-    "question": "A customer has no orders. After a LEFT JOIN to orders, does COUNT(*) give zero for that customer?",
-    "answer": "It gives one because the join keeps a customer row. Count a non-nullable order column, such as orders.id, to get zero."
+    "topic": "Log timestamps",
+    "question": "Which day number is written to this UTC log?",
+    "code": "function logDay(iso) {\n  return new Date(iso).getUTCDay();\n}\nconsole.log(logDay(\"2025-09-15T12:00:00Z\"));",
+    "output": "1",
+    "answer": "getUTCDay returns the weekday, with Monday equal to 1. Use getUTCDate for the day of the month, which is 15 here."
   },
   {
-    "topic": "API design",
-    "question": "A PATCH body leaves out the nickname field. Should the API clear it?",
-    "answer": "Only if the API contract says so. With JSON Merge Patch, an omitted field stays as it was, while an explicit null removes it."
+    "topic": "Batch writes",
+    "question": "What is the type of the first item returned by this awaited batch?",
+    "code": "async function saveBatch(ids) {\n  return await ids.map(async id => id);\n}\nconst rows = await saveBatch([7, 8]);\nconsole.log(rows[0] instanceof Promise ? \"Promise\" : \"ID\");",
+    "output": "Promise",
+    "answer": "Awaiting an array yields the array itself. The async callback produced a promise for each item. Use Promise.all on the mapped array to obtain the IDs."
   },
   {
-    "topic": "Retries",
-    "question": "A job has three total attempts. On each attempt its HTTP client also makes up to three total attempts. How many calls can reach the service?",
-    "answer": "Up to nine. Choose which layer owns retries, or share a budget across layers to bound the total."
+    "topic": "API payloads",
+    "question": "Which fields will the client actually receive?",
+    "code": "function makePatch() {\n  return JSON.stringify({ nickname: undefined, owner: null });\n}\nconsole.log(makePatch());",
+    "output": "{\"owner\":null}",
+    "answer": "JSON omits object properties with undefined values and preserves explicit null values. That difference matters for partial updates."
   },
   {
-    "topic": "Time",
-    "question": "A reminder is scheduled for 09:00 local time every day. Is adding 24 hours to yesterday’s UTC timestamp always correct?",
-    "answer": "No. A daylight-saving transition can move the local hour. Schedule the calendar time in the intended time zone."
+    "topic": "Job deduplication",
+    "question": "How many jobs survive this attempt to remove duplicates?",
+    "code": "function uniqueJobs(jobs) {\n  return new Set(jobs).size;\n}\nconsole.log(uniqueJobs([{ id: 9 }, { id: 9 }]));",
+    "output": "2",
+    "answer": "Set compares objects by reference. These are separate objects with the same ID. Deduplicate on the stable job ID."
   },
   {
-    "topic": "Backpressure",
-    "question": "A worker processes ten jobs per second. What happens if new jobs keep arriving at twelve per second?",
-    "answer": "The backlog grows by about two jobs every second. A queue absorbs bursts; sustained overload needs more capacity or a lower admission rate."
+    "topic": "Shared defaults",
+    "question": "How many labels does a brand-new request inherit?",
+    "code": "const defaults = { labels: [] };\nfunction newRequest() {\n  return { ...defaults };\n}\nnewRequest().labels.push(\"urgent\");\nconsole.log(newRequest().labels.length);",
+    "output": "1",
+    "answer": "Object spread only copies the outer object. Both requests share the same labels array. Create a fresh array per request."
   },
   {
-    "topic": "Data types",
-    "question": "An order ID fits in PostgreSQL bigint. Can a JavaScript client always read it exactly as a Number?",
-    "answer": "No. Some valid 64-bit IDs exceed JavaScript’s safe integer range. A JSON string preserves the digits across the API boundary."
+    "topic": "Response order",
+    "question": "The second query finishes first. What order does Promise.all return?",
+    "code": "function slowQuery() {\n  return new Promise(resolve => setTimeout(() => resolve(\"first\"), 10));\n}\nconst rows = await Promise.all([slowQuery(), Promise.resolve(\"second\")]);\nconsole.log(rows.join(\",\"));",
+    "output": "first,second",
+    "answer": "Promise.all preserves input order regardless of completion order. The slow query still occupies the first slot."
   },
   {
-    "topic": "SQL filters",
-    "question": "An order has no shipped_at value. Will WHERE shipped_at = NULL find it?",
-    "answer": "No. The comparison evaluates to unknown. Use IS NULL to find the row."
+    "topic": "Cache keys",
+    "question": "Can the second request reuse the cached result?",
+    "code": "const cache = new Map();\nfunction key(userId) {\n  return { userId };\n}\ncache.set(key(42), \"ready\");\nconsole.log(cache.has(key(42)));",
+    "output": "false",
+    "answer": "Map compares the two object keys by identity. Use a stable primitive key for equivalent requests."
   },
   {
-    "topic": "Connections",
-    "question": "You give each API instance a database pool of twenty connections, then scale to ten instances. How large can total pool usage get?",
-    "answer": "Up to two hundred connections, before counting other clients. Size pools against the database’s shared connection budget."
+    "topic": "Patch semantics",
+    "question": "After this update, which notification setting is stored?",
+    "code": "function applyPatch(current, patch) {\n  return { notify: patch.notify || current.notify };\n}\nconsole.log(applyPatch({ notify: true }, { notify: false }).notify);",
+    "output": "true",
+    "answer": "The false value is lost before the update runs. Use ?? when only missing or null settings should inherit the old value."
   },
   {
-    "topic": "Batching",
-    "question": "A page lists twenty orders. One query loads the orders, then one query per order fetches its customer. How many queries is that?",
-    "answer": "Twenty-one. Fetch customers in one batch or join them in the first query. Measure the round trips as well as the individual query times."
+    "topic": "Missing rows",
+    "question": "The lookup misses. Which job is left in the queue?",
+    "code": "const jobs = [\"email\", \"report\"];\nfunction cancel(job) {\n  jobs.splice(jobs.indexOf(job), 1);\n}\ncancel(\"missing\");\nconsole.log(jobs.join(\",\"));",
+    "output": "email",
+    "answer": "indexOf returns -1. splice(-1, 1) removes the last job. Check that the index is nonnegative before deleting."
   },
   {
-    "topic": "Message order",
-    "question": "Two workers consume jobs in FIFO order. Must the jobs finish in that order too?",
-    "answer": "No. The second worker can finish first. If order matters for a customer, coordinate processing per customer or use sequence numbers."
+    "topic": "Query parameters",
+    "question": "Which tag does this handler receive?",
+    "code": "function tag(query) {\n  return new URLSearchParams(query).get(\"tag\");\n}\nconsole.log(tag(\"tag=node&tag=go\"));",
+    "output": "node",
+    "answer": "get returns the first matching value. Use getAll when the endpoint accepts repeated filters."
   },
   {
-    "topic": "Timeouts",
-    "question": "A caller gives up after two seconds. Has the database query necessarily stopped?",
-    "answer": "No. The query can keep using a connection. Propagate cancellation and configure a database-side timeout where appropriate."
+    "topic": "Monetary totals",
+    "question": "Does this order pass the exact-total check?",
+    "code": "function matchesTotal(a, b, total) {\n  return a + b === total;\n}\nconsole.log(matchesTotal(0.1, 0.2, 0.3));",
+    "output": "false",
+    "answer": "Binary floating point cannot represent these decimal amounts exactly. For this currency, compare integer minor units or use exact decimals."
   },
   {
-    "topic": "Uniqueness",
-    "question": "Two requests check that a username is free before either saves it. Can both checks pass?",
-    "answer": "Yes. Put a unique constraint on the username in the database and handle the conflict when writing."
+    "topic": "Worker cleanup",
+    "question": "A job fails inside try. What does its caller observe?",
+    "code": "function runJob() {\n  try { throw new Error(\"write failed\"); }\n  finally { return \"done\"; }\n}\nconsole.log(runJob());",
+    "output": "done",
+    "answer": "A return inside finally overrides the pending exception. Clean up in finally without returning a success value."
   },
   {
-    "topic": "Transactions",
-    "question": "Can a successful SQL UPDATE affect zero rows?",
-    "answer": "Yes. No matching row is a valid result. Check the affected row count before reporting that a requested change happened."
+    "topic": "Promise errors",
+    "question": "Will this local catch supply the fallback?",
+    "code": "async function load() {\n  try { return Promise.reject(new Error(\"offline\")); }\n  catch { return \"fallback\"; }\n}\nconsole.log(await load().catch(() => \"outer catch\"));",
+    "output": "outer catch",
+    "answer": "Returning a rejected promise leaves the try block before the rejection is observed. Use return await inside this try if the local catch should handle the rejection."
   },
   {
-    "topic": "HTTP caching",
-    "question": "A client gets 304 Not Modified but the response has no JSON body. Where does the data come from?",
-    "answer": "From the client’s stored representation. A conditional request lets the server validate that cached response without sending the body again."
+    "topic": "Page size",
+    "question": "The client requests a page size of \"2rows\". What is accepted?",
+    "code": "function pageSize(raw) {\n  return parseInt(raw, 10);\n}\nconsole.log(pageSize(\"2rows\"));",
+    "output": "2",
+    "answer": "parseInt stops at the first invalid character. Validate the entire value and its allowed range before using it."
   },
   {
-    "topic": "Event delivery",
-    "question": "An order commits successfully. The process crashes just before publishing OrderCreated. Does the queue know the order exists?",
-    "answer": "No. Save an outbox event with the order in the same transaction. A separate publisher can then deliver it after a restart."
+    "topic": "Pagination cursors",
+    "question": "Page one ends on this date. How many unseen rows will page two return?",
+    "code": "function nextPage(rows, cursorDate) {\n  return rows.filter(row => row.day > cursorDate);\n}\nconst unseen = [{ id: 2, day: \"2026-11-25\" }];\nconsole.log(nextPage(unseen, \"2026-11-25\").length);",
+    "output": "0",
+    "answer": "The date alone does not identify the last row. A cursor containing both date and a unique ID can retain rows that share a date."
   },
   {
-    "topic": "Pagination",
-    "question": "You fetch page one, then a new row is inserted at the top. Can offset-based page two repeat an item?",
-    "answer": "Yes. The insert shifts the offsets. A cursor on a stable, uniquely ordered key lets you continue after the last item you saw."
+    "topic": "Queue retries",
+    "question": "Does an attempt at the retry limit get scheduled again?",
+    "code": "function retry(attempts, maxTotalAttempts) {\n  return attempts <= maxTotalAttempts;\n}\nconsole.log(retry(3, 3));",
+    "output": "true",
+    "answer": "The inclusive test allows one extra attempt when attempts already counts completed runs. Use a strict comparison to enforce this limit."
   },
   {
-    "topic": "API contracts",
-    "question": "A DELETE succeeds. Repeating it returns 404. Can that endpoint still be idempotent?",
-    "answer": "Yes. Idempotency concerns the intended effect: the resource remains absent. The response status can differ on the second call."
+    "topic": "Chunking",
+    "question": "How many records get sent if the buffer has exactly three items?",
+    "code": "function firstBatch(records, size) {\n  return records.slice(0, records.length % size);\n}\nconsole.log(firstBatch([\"a\", \"b\", \"c\"], 3).length);",
+    "output": "0",
+    "answer": "An end index is exclusive. The code slices up to zero for an exact multiple. Use slice(0, size) for the first full batch."
   },
   {
-    "topic": "Money",
-    "question": "A cart total is calculated with binary floating point. Can adding two decimal prices introduce a rounding error?",
-    "answer": "Yes. Use an exact decimal representation or integer minor units with the correct currency scale, and define when rounding happens."
+    "topic": "Collected results",
+    "question": "Does one failed operation erase the successful result here?",
+    "code": "async function outcomes() {\n  const results = await Promise.allSettled([Promise.resolve(\"ok\"), Promise.reject(\"busy\")]);\n  return results.map(r => r.status === \"fulfilled\" ? r.value : r.status);\n}\nconsole.log((await outcomes()).join(\",\"));",
+    "output": "ok,rejected",
+    "answer": "allSettled keeps a result for every input, including failures. Inspect each status before using its value."
   },
   {
-    "topic": "Monitoring",
-    "question": "Your endpoint averages 50 ms. Does that prove nearly every user gets a fast response?",
-    "answer": "No. A small group of very slow requests can disappear in the mean. Check latency percentiles and break them down by endpoint."
+    "topic": "Byte limits",
+    "question": "An endpoint caps payloads by bytes. Which two lengths does this log?",
+    "code": "function lengths(body) {\n  return [body.length, Buffer.byteLength(body, \"utf8\")];\n}\nconsole.log(lengths(\"é\").join(\",\"));",
+    "output": "1,2",
+    "answer": "String length counts UTF-16 code units. The character shown occupies two UTF-8 bytes. Check the encoded byte length for a byte limit."
   },
   {
-    "topic": "Job recovery",
-    "question": "A job takes sixty seconds, but its queue visibility timeout is thirty. Can two healthy workers run it at once?",
-    "answer": "Yes. The message may become visible while the first worker is still running. Renew the lease when supported and make the work safe to repeat."
+    "topic": "Timeout units",
+    "question": "A token lives for 60 seconds. How many milliseconds does this code add?",
+    "code": "function expiresAt(nowMs, ttlSeconds) {\n  return nowMs + ttlSeconds;\n}\nconsole.log(expiresAt(1000, 60) - 1000);",
+    "output": "60",
+    "answer": "The timestamp is in milliseconds but the lifetime is in seconds. Convert seconds to milliseconds before adding."
   },
   {
-    "topic": "SQL aggregates",
-    "question": "A product has no sales. In PostgreSQL, does SUM(amount) over its empty set return 0?",
-    "answer": "It returns NULL. If the reporting contract calls for zero, use COALESCE(SUM(amount), 0)."
+    "topic": "Sparse batches",
+    "question": "How many tasks does this batch start?",
+    "code": "function startBatch(size) {\n  let started = 0;\n  new Array(size).forEach(() => started++);\n  return started;\n}\nconsole.log(startBatch(3));",
+    "output": "0",
+    "answer": "An array created with only a length has holes. forEach skips them. Use Array.from to create actual entries."
   }
 ]
