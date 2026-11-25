@@ -17,14 +17,26 @@
 
 <!-- daily-backend:start -->
 
-<p><sub>25 Nov 2026 · Pagination</sub></p>
+<p><sub>25 Nov 2026 · Concurrent writes</sub></p>
 
-<p><strong>Every result is sorted by created_at. Two rows have the same timestamp. Which one appears first?</strong></p>
+<p><strong>Both calls finish. What does the last line print?</strong></p>
+
+```javascript
+let count = 0;
+async function increment() {
+  const previous = count;
+  await Promise.resolve();
+  count = previous + 1;
+}
+await Promise.all([increment(), increment()]);
+console.log(count);
+```
 
 <details>
 <summary>Reveal the answer</summary>
 
-<p>Either one can. For a repeatable order, add a unique tie-breaker such as id and use both fields in the pagination cursor.</p>
+<p>Output: <code>1</code></p>
+<p>Both calls read 0 before either resumes after await. Both then write 1. For a shared database counter, increment it atomically in the database.</p>
 
 </details>
 
