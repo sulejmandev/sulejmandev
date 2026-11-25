@@ -1,28 +1,31 @@
-<h1 align="center">Sulejman Alawashreh</h1>
+<p><img width="100%" src="assets/identity.png" alt="Sulejman Alawashreh · Software Engineer · Amman, Jordan"></p>
 
-<p align="center">
-  <strong>Full-stack web developer</strong><br>
-  Amman, Jordan
+<p>I’m a software engineer who turns complex workflows into straightforward web applications. I design each feature around how data moves, how the pieces fit together, and what should happen when something goes wrong.</p>
+
+<p>
+  <a href="mailto:hello@sulejman.dev"><img src="assets/email.svg" width="252" alt="Send me an email"></a>
+  <a href="https://www.linkedin.com/in/sulejmandev/"><img src="assets/linkedin.svg" width="252" alt="Connect on LinkedIn"></a>
+  <a href="https://github.com/sulejmandev/portfolio"><img src="assets/portfolio.svg" width="252" alt="View code on GitHub"></a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/sulejmandev/portfolio">Portfolio source</a>
-  &nbsp;·&nbsp;
-  <a href="https://www.linkedin.com/in/sulejmandev/">LinkedIn</a>
-  &nbsp;·&nbsp;
-  <a href="mailto:hello@sulejman.dev">Email</a>
-</p>
+<h2>My stack</h2>
 
-I build web applications in TypeScript, from the interface in React to the API in Node.js. On the frontend, I pay particular attention to how a page feels when it opens and how people move through it.
+<p><img width="49%" src="assets/stack-0.png" alt="Front-end — TanStack Start, Next.js, TypeScript, Tailwind CSS" title="TanStack Start, Next.js, TypeScript, Tailwind CSS"> <img width="49%" src="assets/stack-1.png" alt="Back-end — Node.js, Express, Python, Go, Bun" title="Node.js, Express, Python, Go, Bun"><br>
+<img width="49%" src="assets/stack-2.png" alt="Database — PostgreSQL, MongoDB" title="PostgreSQL, MongoDB"> <img width="49%" src="assets/stack-3.png" alt="CI/CD — GitHub Actions, Git" title="GitHub Actions, Git"></p>
 
-## Featured work
+<h2>One-minute back-end challenge</h2>
 
-### Personal portfolio
+<!-- daily-backend:start -->
 
-My portfolio opens with an animated SVG logo. The same geometric style carries through to a full-screen navigation menu. I built both interactions with Next.js, Tailwind CSS, and Framer Motion.
+<p><sub>22 Nov 2026 · Retries</sub></p>
 
-[Explore the repository ↗](https://github.com/sulejmandev/portfolio) · [Logo animation](https://github.com/sulejmandev/portfolio/blob/main/src/components/IntroLogo.tsx) · [Menu transition](https://github.com/sulejmandev/portfolio/blob/main/src/components/Navbar.tsx)
+<p><strong>A client sends a payment request and times out. Is it safe to send exactly the same request again?</strong></p>
 
-## Toolkit
+<details>
+<summary>Reveal the answer</summary>
 
-<img src="https://skillicons.dev/icons?i=ts,react,nextjs,tailwind,nodejs,nestjs,graphql,postgres&amp;theme=dark" width="360" alt="TypeScript, React, Next.js, Tailwind CSS, Node.js, NestJS, GraphQL, and PostgreSQL">
+<p>The timeout only tells you the client stopped waiting. The charge may already exist. If the provider supports idempotency keys, reuse the original key for the same payment and check its recorded outcome.</p>
+
+</details>
+
+<!-- daily-backend:end -->
