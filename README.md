@@ -1,25 +1,34 @@
-![Sulejman Alawashreh · Software Engineer · Amman, Jordan](assets/sulejman-s-reverse-9f778fc9.gif)
+<a name="overview"></a>
 
-<p>I’m a software engineer who turns complex workflows into straightforward web applications. I design each feature around how data moves, how the pieces fit together, and what should happen when something goes wrong.</p>
+<picture>
+  <source media="(max-width: 600px)" srcset="assets/sulejman-mobile.gif">
+  <img width="100%" src="assets/sulejman-desktop.gif" alt="Sulejman Alawashreh · Software Engineer · Amman, Jordan. I’m a software engineer who turns complex workflows into straightforward web applications. I design each feature around how data moves, how the pieces fit together, and what should happen when something goes wrong.">
+</picture>
 
 <p>
-  <a href="mailto:hello@sulejman.dev"><img src="assets/email.svg" width="252" alt="Send me an email"></a>
-  <a href="https://www.linkedin.com/in/sulejmandev/"><img src="assets/linkedin.svg" width="252" alt="Connect on LinkedIn"></a>
-  <a href="https://github.com/sulejmandev/portfolio"><img src="assets/portfolio.svg" width="252" alt="View code on GitHub"></a>
+<a href="mailto:hello@sulejman.dev"><img width="200" src="assets/email.svg" alt="Send me an email"></a>
+<a href="https://www.linkedin.com/in/sulejmandev/"><img width="200" src="assets/linkedin.svg" alt="Connect on LinkedIn"></a>
+<a href="https://github.com/sulejmandev/portfolio"><img width="200" src="assets/portfolio.svg" alt="View code on GitHub"></a>
 </p>
 
-<h2>My stack</h2>
+<picture>
+  <source media="(max-width: 600px)" srcset="assets/stack-mobile.svg">
+  <img width="100%" src="assets/stack-desktop.svg" alt="Front-end: TanStack Start, Next.js, TypeScript, Tailwind CSS. Back-end: Node.js, Express, Python, Go, Bun. Database: PostgreSQL, MongoDB. CI/CD: GitHub Actions and Git.">
+</picture>
 
-<p><img width="49%" src="assets/stack-0.png" alt="Front-end — TanStack Start, Next.js, TypeScript, Tailwind CSS" title="TanStack Start, Next.js, TypeScript, Tailwind CSS"> <img width="49%" src="assets/stack-1.png" alt="Back-end — Node.js, Express, Python, Go, Bun" title="Node.js, Express, Python, Go, Bun"><br>
-<img width="49%" src="assets/stack-2.png" alt="Database — PostgreSQL, MongoDB" title="PostgreSQL, MongoDB"> <img width="49%" src="assets/stack-3.png" alt="CI/CD — GitHub Actions, Git" title="GitHub Actions, Git"></p>
-
-<h2>One-minute back-end challenge</h2>
+<a name="daily-challenge"></a>
 
 <!-- daily-backend:start -->
 
-<p><sub>25 Nov 2026 · Concurrent writes</sub></p>
+<picture>
+  <source media="(max-width: 600px)" srcset="assets/daily-mobile.svg">
+  <img src="assets/daily.svg" width="100%" alt="One-minute back-end challenge · 25 Nov 2026 · Concurrent writes. Both calls finish. What does the last line print?">
+</picture>
 
-<p><strong>Both calls finish. What does the last line print?</strong></p>
+<details>
+<summary>Read or copy the function</summary>
+
+Both calls finish. What does the last line print?
 
 ```javascript
 let count = 0;
@@ -32,8 +41,10 @@ await Promise.all([increment(), increment()]);
 console.log(count);
 ```
 
+</details>
+
 <details>
-<summary>Reveal the answer</summary>
+<summary><strong>Reveal the answer</strong></summary>
 
 <p>Output: <code>1</code></p>
 <p>Both calls read 0 before either resumes after await. Both then write 1. For a shared database counter, increment it atomically in the database.</p>
@@ -41,3 +52,5 @@ console.log(count);
 </details>
 
 <!-- daily-backend:end -->
+
+<p align="right"><a href="#overview">Back to top ↑</a></p>
