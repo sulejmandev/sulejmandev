@@ -22,23 +22,25 @@
 
 <picture>
   <source media="(max-width: 600px)" srcset="assets/daily-mobile.svg">
-  <img src="assets/daily.svg" width="100%" alt="One-minute back-end challenge · 25 Nov 2026 · Concurrent writes. Both calls finish. What does the last line print?">
+  <img src="assets/daily.svg" width="100%" alt="One-minute back-end challenge · 26 Nov 2026 · Caching zero. How many times does this function read the stock?">
 </picture>
 
 <details>
 <summary>Read or copy the function</summary>
 
-Both calls finish. What does the last line print?
+How many times does this function read the stock?
 
 ```javascript
-let count = 0;
-async function increment() {
-  const previous = count;
-  await Promise.resolve();
-  count = previous + 1;
+const cache = new Map();
+let reads = 0;
+function stock(sku) {
+  if (cache.get(sku)) return cache.get(sku);
+  reads++;
+  cache.set(sku, 0);
+  return 0;
 }
-await Promise.all([increment(), increment()]);
-console.log(count);
+stock("A"); stock("A");
+console.log(reads);
 ```
 
 </details>
@@ -46,8 +48,8 @@ console.log(count);
 <details>
 <summary><strong>Reveal the answer</strong></summary>
 
-<p>Output: <code>1</code></p>
-<p>Both calls read 0 before either resumes after await. Both then write 1. For a shared database counter, increment it atomically in the database.</p>
+<p>Output: <code>2</code></p>
+<p>A stock count of 0 is falsy, so both calls miss the cache check. Use cache.has(sku) to distinguish a cached zero from a missing entry.</p>
 
 </details>
 
