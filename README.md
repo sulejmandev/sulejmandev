@@ -22,25 +22,19 @@
 
 <picture>
   <source media="(max-width: 600px)" srcset="assets/daily-mobile.svg">
-  <img src="assets/daily.svg" width="100%" alt="One-minute back-end challenge · 26 Nov 2026 · Caching zero. How many times does this function read the stock?">
+  <img src="assets/daily.svg" width="100%" alt="One-minute back-end challenge · 27 Nov 2026 · Retry budget. With a retry limit of zero, what does this function return?">
 </picture>
 
 <details>
 <summary>Read or copy the function</summary>
 
-How many times does this function read the stock?
+With a retry limit of zero, what does this function return?
 
 ```javascript
-const cache = new Map();
-let reads = 0;
-function stock(sku) {
-  if (cache.get(sku)) return cache.get(sku);
-  reads++;
-  cache.set(sku, 0);
-  return 0;
+function retryLimit(value) {
+  return value || 3;
 }
-stock("A"); stock("A");
-console.log(reads);
+console.log(retryLimit(0));
 ```
 
 </details>
@@ -48,8 +42,8 @@ console.log(reads);
 <details>
 <summary><strong>Reveal the answer</strong></summary>
 
-<p>Output: <code>2</code></p>
-<p>A stock count of 0 is falsy, so both calls miss the cache check. Use cache.has(sku) to distinguish a cached zero from a missing entry.</p>
+<p>Output: <code>3</code></p>
+<p>The || operator replaces zero with the default. Use value ?? 3 when zero means no retries.</p>
 
 </details>
 
