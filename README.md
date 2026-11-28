@@ -22,19 +22,19 @@
 
 <picture>
   <source media="(max-width: 600px)" srcset="assets/daily-mobile.svg">
-  <img src="assets/daily.svg" width="100%" alt="One-minute back-end challenge · 27 Nov 2026 · Retry budget. With a retry limit of zero, what does this function return?">
+  <img src="assets/daily.svg" width="100%" alt="One-minute back-end challenge · 28 Nov 2026 · Async filtering. Only job 2 is ready. Which IDs does this return?">
 </picture>
 
 <details>
 <summary>Read or copy the function</summary>
 
-With a retry limit of zero, what does this function return?
+Only job 2 is ready. Which IDs does this return?
 
 ```javascript
-function retryLimit(value) {
-  return value || 3;
+function readyJobs(ids) {
+  return ids.filter(async id => id === 2);
 }
-console.log(retryLimit(0));
+console.log(readyJobs([1, 2]).join(","));
 ```
 
 </details>
@@ -42,8 +42,8 @@ console.log(retryLimit(0));
 <details>
 <summary><strong>Reveal the answer</strong></summary>
 
-<p>Output: <code>3</code></p>
-<p>The || operator replaces zero with the default. Use value ?? 3 when zero means no retries.</p>
+<p>Output: <code>1,2</code></p>
+<p>filter checks the callback result immediately. Both promises are truthy, even the one that resolves to false. Await the readiness checks before filtering.</p>
 
 </details>
 
